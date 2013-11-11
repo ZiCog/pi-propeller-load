@@ -35,8 +35,11 @@
 /* serial i/o definitions */
 #define SERIAL_TIMEOUT  -1
 
+/* Method of issuing reset to the Propeller chip. */
+typedef enum {RESET_WITH_RTS, RESET_WITH_DTR, RESET_WITH_GPIO} reset_method_t;
+
 /* serial i/o routines */
-void serial_use_rts_for_reset(int use_rts);
+void use_reset_method(reset_method_t reset_method);
 int serial_find(const char* prefix, int (*check)(const char* port, void* data), void* data);
 int serial_init(const char *port, unsigned long baud);
 void serial_done(void);

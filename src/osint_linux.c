@@ -50,12 +50,12 @@ static HANDLE hSerial = -1;
 static struct termios old_sparm;
 static int continue_terminal = 1;
 
-/* normally we use DTR for reset but setting this variable to non-zero will use RTS instead */
-static int use_rts_for_reset = 0;
+/* Normally we use DTR for reset */
+static reset_method_t reset_method = RESET_WITH_DTR;
 
-void serial_use_rts_for_reset(int use_rts)
+void use_reset_method(reset_method_t method)
 {
-    use_rts_for_reset = use_rts;
+   reset_method = method;
 }
 
 static void chk(char *fun, int sts)
@@ -299,16 +299,62 @@ int rx_timeout(uint8_t* buff, int n, int timeout)
 }
 
 /**
- * hwreset ... resets Propeller hardware using DTR or RTS
- * @param sparm - pointer to DCB serial control struct
+ * assert_reset ... Asserts the Propellers reset signal via DTR, RTS or GPIO pin.
+ * @returns void
+ */
+static void assert_reset(void)
+{
+    int cmd;
+
+    switch (reset_method)
+    {
+    case RESET_WITH_DTR:
+        cmd = TIOCM_DTR;
+        ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
+        break;
+    case RESET_WITH_RTS:
+        cmd = TIOCM_RTS;
+        ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
+        break;
+    case RESET_WITH_GPIO:
+
+        break;
+    }
+}
+
+/**
+ * deassert_reset ... Deasserts the Propellers reset signal via DTR, RTS or GPIO pin.
+ * @returns void
+ */
+static void deassert_reset(void)
+{
+    int cmd;
+
+    switch (reset_method)
+    {
+    case RESET_WITH_DTR:
+        cmd = TIOCM_DTR;
+        ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
+        break;
+    case RESET_WITH_RTS:
+        cmd = TIOCM_RTS;
+        ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
+        break;
+    case RESET_WITH_GPIO:
+
+        break;
+    }
+}
+
+/**
+ * hwreset ... resets Propeller hardware.
  * @returns void
  */
 void hwreset(void)
 {
-    int cmd = use_rts_for_reset ? TIOCM_RTS : TIOCM_DTR;
-    ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
+    assert_reset();
     msleep(10);
-    ioctl(hSerial, TIOCMBIC, &cmd); /* clear bit */
+    deassert_reset();
     msleep(90);
     tcflush(hSerial, TCIFLUSH);
 }
