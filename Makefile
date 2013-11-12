@@ -132,6 +132,7 @@ $(OBJDIR)/system.o \
 $(OBJDIR)/port.o \
 $(OBJDIR)/serial_helper.o \
 $(OBJDIR)/flash_loader.o \
+$(OBJDIR)/gpio_sysfs.o \
 $(foreach x, $(OSINT), $(OBJDIR)/$(x).o)
 
 IMAGE_SIZE_OBJS=\

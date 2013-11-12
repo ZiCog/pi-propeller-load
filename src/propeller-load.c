@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
     char *port, *board, *subtype, *value;
     System sys;
     int baud = 115200;
-    reset_method_t reset_method = RESET_WITH_DTR;
     int portFlags = 0;
     int flags = 0;
     int i;
@@ -268,19 +267,20 @@ int main(int argc, char *argv[])
         
     /* use the baud rate from the configuration */
     GetNumericConfigField(config, "baudrate", &baud);
-    if ((value = GetConfigField(config, "reset")) != NULL) {
-        if (strcasecmp(value, "dtr") == 0)
-            reset_method = RESET_WITH_DTR;
-        else if (strcasecmp(value, "rts") == 0)
-            reset_method = RESET_WITH_RTS;
-        else if (strcasecmp(value, "gpio") == 0)
-            reset_method = RESET_WITH_GPIO;
-        else {
+
+    /* Use reset method from configuration */
+    if ((value = GetConfigField(config, "reset")) != NULL)
+    {
+        if (use_reset_method ("value"))
+        {
             printf("error: no reset type '%s'\n", value);
             return 1;
         }
     }
-    use_reset_method (reset_method);
+    else
+    {
+        use_reset_method ("dtr");
+    }
 
     /* check for being asked to show ports */
     if (showPorts) {

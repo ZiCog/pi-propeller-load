@@ -2,7 +2,7 @@
  * @file osint.h
  *
  * Serial I/O functions used by PLoadLib.c
-  *
+ *
  * Copyright (c) 2009 by John Steven Denson
  * Modified in 2011 by David Michael Betz
  *
@@ -39,7 +39,7 @@
 typedef enum {RESET_WITH_RTS, RESET_WITH_DTR, RESET_WITH_GPIO} reset_method_t;
 
 /* serial i/o routines */
-void use_reset_method(reset_method_t reset_method);
+int use_reset_method(char* method);
 int serial_find(const char* prefix, int (*check)(const char* port, void* data), void* data);
 int serial_init(const char *port, unsigned long baud);
 void serial_done(void);

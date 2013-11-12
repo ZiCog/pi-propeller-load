@@ -44,6 +44,7 @@
 #include <signal.h>
 
 #include "osint.h"
+#include "gpio_sysfs.h"
 
 typedef int HANDLE;
 static HANDLE hSerial = -1;
@@ -53,9 +54,18 @@ static int continue_terminal = 1;
 /* Normally we use DTR for reset */
 static reset_method_t reset_method = RESET_WITH_DTR;
 
-void use_reset_method(reset_method_t method)
+int use_reset_method(char* method)
 {
-   reset_method = method;
+    if (strcasecmp(method, "dtr") == 0)
+        reset_method = RESET_WITH_DTR;
+    else if (strcasecmp(method, "rts") == 0)
+       reset_method = RESET_WITH_RTS;
+    else if (strcasecmp(method, "gpio") == 0)
+        reset_method = RESET_WITH_GPIO;
+    else {
+        return -1;
+    }
+    return 0;
 }
 
 static void chk(char *fun, int sts)
