@@ -61,7 +61,12 @@ int use_reset_method(char* method)
     else if (strcasecmp(method, "rts") == 0)
        reset_method = RESET_WITH_RTS;
     else if (strcasecmp(method, "gpio") == 0)
+    {
         reset_method = RESET_WITH_GPIO;
+        gpio_export(17);
+        gpio_write(17, 0);
+        gpio_direction(17, 1);
+    }
     else {
         return -1;
     }
@@ -239,6 +244,10 @@ void serial_done(void)
     	close(hSerial);
     	hSerial = -1;
     }
+    if (reset_method == RESET_WITH_GPIO)
+    {
+        gpio_unexport(17);
+    }
 }
 
 /**
@@ -327,7 +336,7 @@ static void assert_reset(void)
         ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
         break;
     case RESET_WITH_GPIO:
-
+        gpio_write(17, 1);
         break;
     }
 }
@@ -351,7 +360,7 @@ static void deassert_reset(void)
         ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
         break;
     case RESET_WITH_GPIO:
-
+        gpio_write(17, 0);
         break;
     }
 }

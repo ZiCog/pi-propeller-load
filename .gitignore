@@ -16,3 +16,11 @@
 *.exe
 *.out
 *.app
+*.elf
+
+# Propeller dat files
+*.dat
+
+bin/*
+obj/*
+
