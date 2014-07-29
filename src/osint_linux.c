@@ -44,9 +44,12 @@
 #include <signal.h>
 
 #include "osint.h"
-#ifdef RASPBERRY_PI
+#ifdef USE_GPIO 
 #include "gpio_sysfs.h"
 #endif
+
+#define PROPELLER_RESET_PIN 11
+
 
 typedef int HANDLE;
 static HANDLE hSerial = -1;
@@ -62,13 +65,13 @@ int use_reset_method(char* method)
         reset_method = RESET_WITH_DTR;
     else if (strcasecmp(method, "rts") == 0)
        reset_method = RESET_WITH_RTS;
-#ifdef RASPBERRY_PI
+#ifdef USE_GPIO 
     else if (strcasecmp(method, "gpio") == 0)
     {
         reset_method = RESET_WITH_GPIO;
-        gpio_export(17);
-        gpio_write(17, 0);
-        gpio_direction(17, 1);
+        gpio_export(PROPELLER_RESET_PIN);
+        gpio_write(PROPELLER_RESET_PIN, 1);
+        gpio_direction(PROPELLER_RESET_PIN, 1);
     }
 #endif
     else {
@@ -248,10 +251,10 @@ void serial_done(void)
         close(hSerial);
         hSerial = -1;
     }
-#ifdef RASPBERRY_PI
+#ifdef USE_GPIO 
     if (reset_method == RESET_WITH_GPIO)
     {
-        gpio_unexport(17);
+        // gpio_unexport(PROPELLER_RESET_PIN);  FIXME: This does not work on OpenWRT on DLINK-615-D1
     }
 #endif
 }
@@ -341,9 +344,9 @@ static void assert_reset(void)
         cmd = TIOCM_RTS;
         ioctl(hSerial, TIOCMBIS, &cmd); /* assert bit */
         break;
-#ifdef RASPBERRY_PI
+#ifdef USE_GPIO 
     case RESET_WITH_GPIO:
-        gpio_write(17, 1);
+        gpio_write(PROPELLER_RESET_PIN, 0);
         break;
 #endif
     default:
@@ -370,9 +373,9 @@ static void deassert_reset(void)
         cmd = TIOCM_RTS;
         ioctl(hSerial, TIOCMBIC, &cmd); /* assert bit */
         break;
-#ifdef RASPBERRY_PI
+#ifdef USE_GPIO 
     case RESET_WITH_GPIO:
-        gpio_write(17, 0);
+        gpio_write(PROPELLER_RESET_PIN, 1);
         break;
 #endif
     default:
