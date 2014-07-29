@@ -21,7 +21,7 @@ DRVDIR=$(BUILDROOT)/propeller-load
 INSTALLBINDIR=$(TARGET)/bin
 INSTALLLIBDIR=$(TARGET)/propeller-load
 
-#CC=gcc
+CC=gcc
 TOOLCC=$(CC)
 ECHO=echo
 MKDIR=mkdir -p
@@ -221,7 +221,7 @@ $(OBJDIR)/%.binary:	$(SPINDIR)/%.spin $(SPIN_SRCS)
 	@$(ECHO) $@
 
 $(OBJDIR)/%.c:	$(OBJDIR)/%.binary
-	@bin2c$(EXT) $< $@
+	@$(BINDIR)/bin2c$(EXT) $< $@
 	@$(ECHO) $@
 
 ###############
@@ -276,7 +276,7 @@ $(PROPOBJDIR)/%.bin:	$(PROPOBJDIR)/%.o $(HDRS)
 	@$(ECHO) binary $@
 
 $(OBJDIR)/%.c:	$(PROPOBJDIR)/%.bin bin2c $(OBJDIR)/dir-created
-	@bin2c$(EXT) $< $@
+	@$(BINDIR)/bin2c$(EXT) $< $@
 	@$(ECHO) bin2c $@
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c $(HDRS)

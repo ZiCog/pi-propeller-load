@@ -13,7 +13,7 @@ Check it works
 Change to loader directory and ...
 
     $ make clean
-    $ OS=linux CC=mipsel-openwrt-linux-uclibc-gcc make
+    $ make OS=linux TOOLCC=mipsel-openwrt-linux-uclibc-gcc 
 
 See what you got
 
