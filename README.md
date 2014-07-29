@@ -7,4 +7,10 @@ pi-propeller-load is the loader for Propeller taken from the upstream sources at
 
 In this repo it is undergoing modification so as to be able make use of the Raspberry Pi UART on the GPIO header.
 
-This is work in proress. Not useable yet. 
+This is work in proress. Not useable yet.
+
+Also supports use as a Propeller loader for routers running OpenWRT. Known to work on DLINK DIR-615-D1
+
+
+
+ 
