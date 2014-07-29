@@ -1,5 +1,5 @@
-pi-propeller-loader
-===================
+pi-propeller-load
+=================
 
 Program the Parallax Inc. Propeller MCU from a Raspberry Pi via the onboard UART. No USB/serial adapter required. 
 
