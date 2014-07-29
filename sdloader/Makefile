@@ -8,16 +8,16 @@ endif
 
 SRCDIR=.
 OBJDIR=$(BUILDROOT)/obj
-DRVDIR=$(BUILDROOT)/include
-
-DIRS = $(OBJDIR) $(DRVDIR)
+DRVDIR=$(BUILDROOT)/propeller-load
 
 CC=propeller-elf-gcc
 ECHO=echo
 MKDIR=mkdir -p
 RM=rm
+TOUCH=touch
 
-CFLAGS=-Os -Wall -mlmm
+CFLAGS=-Os -Wall -mcmm
+LFLAGS=-Wl,--defsym -Wl,__stack_end=0x5000
 
 HDRS=sd_loader.h fatread.h sdio.h ../src/pex.h
 
@@ -26,8 +26,7 @@ all:	$(DRVDIR)/sd_loader.elf $(DRVDIR)/sd_cache_loader.elf
 SDLOADER_OBJS=\
 $(OBJDIR)/sd_loader.o \
 $(OBJDIR)/fatread.o \
-$(OBJDIR)/sdio.o \
-$(OBJDIR)/vm_start.o
+$(OBJDIR)/sdio.o
 
 SDCACHELOADER_OBJS=\
 $(OBJDIR)/sd_cache_loader.o \
@@ -35,21 +34,21 @@ $(OBJDIR)/fatread.o \
 $(OBJDIR)/sdio.o \
 $(OBJDIR)/vm_start.o
 
-$(DRVDIR)/sd_loader.elf:	$(DRVDIR) $(SDLOADER_OBJS)
-	propeller-elf-gcc $(CFLAGS) -o $@ $(SDLOADER_OBJS)
+$(DRVDIR)/sd_loader.elf:	$(DRVDIR)/dir-created $(SDLOADER_OBJS)
+	propeller-elf-gcc $(CFLAGS) $(LFLAGS) -o $@ $(SDLOADER_OBJS)
 
-$(DRVDIR)/sd_cache_loader.elf:	$(DRVDIR) $(SDCACHELOADER_OBJS)
+$(DRVDIR)/sd_cache_loader.elf:	$(DRVDIR)/dir-created $(SDCACHELOADER_OBJS)
 	propeller-elf-gcc $(CFLAGS) -o $@ $(SDCACHELOADER_OBJS)
 
 #########
 # RULES #
 #########
 
-$(OBJDIR)/%.o:	$(SRCDIR)/%.c $(OBJDIR) $(HDRS)
+$(OBJDIR)/%.o:	$(SRCDIR)/%.c $(OBJDIR)/dir-created $(HDRS)
 	$(CC) $(CFLAGS) -c $< -o $@
 	@$(ECHO) $@
 
-$(OBJDIR)/%.o:	$(SRCDIR)/%.S $(OBJDIR) $(HDRS)
+$(OBJDIR)/%.o:	$(SRCDIR)/%.S $(OBJDIR)/dir-created $(HDRS)
 	$(CC) $(CFLAGS) -c $< -o $@
 	@$(ECHO) $@
 
@@ -57,8 +56,9 @@ $(OBJDIR)/%.o:	$(SRCDIR)/%.S $(OBJDIR) $(HDRS)
 # DIRECTORIES #
 ###############
 
-$(DIRS):
-	$(MKDIR) $@
+%/dir-created:
+	@$(MKDIR) -p $(@D)
+	@$(TOUCH) $@
 
 ################
 # CLEAN TARGET #

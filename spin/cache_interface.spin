@@ -33,7 +33,6 @@ CON
   INIT_CONFIG_4         = 5
   _INIT_SIZE            = 6
 
-  ' mailbox offsets
   MBOX_CMD              = 0
   MBOX_ADDR             = 1
   MBOX_EXTRA            = 2     ' extra space for debugging
@@ -54,12 +53,10 @@ CON
 
   CMD_MASK              = %11
   EXTEND_MASK           = %10   ' this bit must be zero for an extended command
-
+  
 VAR
    long vm_mbox
    long vm_linemask
-
-'OBJ d : "BMAUtility"
 
 PUB start(code, mbox, cache, config1, config2, config3, config4) | params[_INIT_SIZE]
     vm_mbox := mbox
@@ -70,7 +67,6 @@ PUB start(code, mbox, cache, config1, config2, config3, config4) | params[_INIT_
     params[INIT_CONFIG_3] := config3
     params[INIT_CONFIG_4] := config4
     long[vm_mbox] := $ffffffff
-    'd.debug(code,@params)
     cognew(code, @params)
     repeat while long[vm_mbox]
     vm_linemask := params[0]
@@ -112,5 +108,3 @@ pub writeFlash(madr, buf, count_) | pbuf, pcnt, paddr
     long[vm_mbox][0] := WRITE_DATA_CMD | (@pbuf << 8)
     repeat while long[vm_mbox][0] <> 0
     return long[vm_mbox][1]
-
-

@@ -21,7 +21,7 @@ DRVDIR=$(BUILDROOT)/propeller-load
 INSTALLBINDIR=$(TARGET)/bin
 INSTALLLIBDIR=$(TARGET)/propeller-load
 
-CC=gcc
+#CC=gcc
 TOOLCC=$(CC)
 ECHO=echo
 MKDIR=mkdir -p
@@ -36,7 +36,7 @@ PROPOBJDIR=$(BUILDROOT)/obj/propeller
 
 ifeq ($(OS),linux)
 SPINCMP?=openspin.linux
-CFLAGS += -DLINUX
+CFLAGS += -DLINUX -DUSE_GPIO
 EXT=
 OSINT=osint_linux
 LIBS=
@@ -140,6 +140,7 @@ $(OBJDIR)/serial_helper.o \
 $(OBJDIR)/serial_helper2.o \
 $(OBJDIR)/flash_loader.o \
 $(OBJDIR)/flash_loader2.o \
+$(OBJDIR)/gpio_sysfs.o \
 $(foreach x, $(OSINT), $(OBJDIR)/$(x).o)
 
 IMAGE_SIZE_OBJS=\
@@ -220,7 +221,7 @@ $(OBJDIR)/%.binary:	$(SPINDIR)/%.spin $(SPIN_SRCS)
 	@$(ECHO) $@
 
 $(OBJDIR)/%.c:	$(OBJDIR)/%.binary
-	@$(BINDIR)/bin2c$(EXT) $< $@
+	@bin2c$(EXT) $< $@
 	@$(ECHO) $@
 
 ###############
@@ -275,7 +276,7 @@ $(PROPOBJDIR)/%.bin:	$(PROPOBJDIR)/%.o $(HDRS)
 	@$(ECHO) binary $@
 
 $(OBJDIR)/%.c:	$(PROPOBJDIR)/%.bin bin2c $(OBJDIR)/dir-created
-	@$(BINDIR)/bin2c$(EXT) $< $@
+	@bin2c$(EXT) $< $@
 	@$(ECHO) bin2c $@
 
 $(OBJDIR)/%.o:	$(OBJDIR)/%.c $(HDRS)

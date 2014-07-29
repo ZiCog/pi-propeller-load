@@ -1,0 +1,23 @@
+Build pi-propeller-load with the OpenWRT toolchain.
+
+An example:
+
+Add the OpenWRT compiler to your PATH
+
+    $ export PATH=$PATH:/home/heater/openwrt/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/bin
+
+Check it works
+
+    $ mipsel-openwrt-linux-uclibc-gcc
+ 
+Change to loader directory and ...
+
+    $ make clean
+    $ OS=linux CC=mipsel-openwrt-linux-uclibc-gcc make
+
+See what you got
+
+    $ file  bin/linux/*
+
+
+
