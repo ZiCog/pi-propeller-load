@@ -48,13 +48,14 @@
 #include "gpio_sysfs.h"
 #endif
 
-#define PROPELLER_RESET_PIN 11
-
-
 typedef int HANDLE;
 static HANDLE hSerial = -1;
 static struct termios old_sparm;
 static int continue_terminal = 1;
+
+static propellerResetGpioPin = 17;
+static propellerResetGpioLevel = 1;
+
 
 /* Normally we use DTR for reset */
 static reset_method_t reset_method = RESET_WITH_DTR;
@@ -65,13 +66,36 @@ int use_reset_method(char* method)
         reset_method = RESET_WITH_DTR;
     else if (strcasecmp(method, "rts") == 0)
        reset_method = RESET_WITH_RTS;
-#ifdef USE_GPIO 
-    else if (strcasecmp(method, "gpio") == 0)
+#ifdef USE_GPIO
+    else if (strncasecmp(method, "gpio", 4) == 0)
     {
         reset_method = RESET_WITH_GPIO;
-        gpio_export(PROPELLER_RESET_PIN);
-        gpio_write(PROPELLER_RESET_PIN, 1);
-        gpio_direction(PROPELLER_RESET_PIN, 1);
+
+        char *token;
+        token = strtok(method, ",");
+        token = strtok(NULL, ",");
+        if (token)
+        {
+            propellerResetGpioPin = atoi(token);
+        }
+        token = strtok(NULL, ",");
+        if (token)
+        {
+            propellerResetGpioLevel = atoi(token); 
+        }
+
+        printf ("Using GPIO pin %d as Propeller reset ", propellerResetGpioPin);
+        if (propellerResetGpioLevel)
+        {
+            printf ("(HIGH).\n");
+        }
+        else
+        {
+            printf ("(LOW).\n");
+        }
+        gpio_export(propellerResetGpioPin);
+        gpio_write(propellerResetGpioPin, propellerResetGpioLevel ^ 1);
+        gpio_direction(propellerResetGpioPin, 1);
     }
 #endif
     else {
@@ -254,7 +278,7 @@ void serial_done(void)
 #ifdef USE_GPIO 
     if (reset_method == RESET_WITH_GPIO)
     {
-        // gpio_unexport(PROPELLER_RESET_PIN);  FIXME: This does not work on OpenWRT on DLINK-615-D1
+        // gpio_unexport(propellerResetGpioPin);  FIXME: This does not work on OpenWRT on DLINK-615-D1
     }
 #endif
 }
@@ -346,7 +370,7 @@ static void assert_reset(void)
         break;
 #ifdef USE_GPIO 
     case RESET_WITH_GPIO:
-        gpio_write(PROPELLER_RESET_PIN, 0);
+        gpio_write(propellerResetGpioPin, propellerResetGpioLevel);
         break;
 #endif
     default:
@@ -375,7 +399,7 @@ static void deassert_reset(void)
         break;
 #ifdef USE_GPIO 
     case RESET_WITH_GPIO:
-        gpio_write(PROPELLER_RESET_PIN, 1);
+        gpio_write(propellerResetGpioPin, propellerResetGpioLevel ^ 1);
         break;
 #endif
     default:

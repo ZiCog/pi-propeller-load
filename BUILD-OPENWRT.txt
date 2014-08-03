@@ -4,7 +4,7 @@ An example:
 
 Add the OpenWRT compiler to your PATH
 
-    $ export PATH=$PATH:/home/heater/openwrt/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/bin
+    $ export PATH=$PATH:~/openwrt/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/bin
 
 Check it works
 

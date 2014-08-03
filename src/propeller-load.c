@@ -408,7 +408,8 @@ It can be used on any board with an SD card slot.\n\
 #ifdef USE_GPIO 
 printf("\
 \n\
-This version supports -Dreset=gpio to use gpio 17 to reset the Propeller board.\n\
+This version supports resetting the Propeller with a GPIO pin with option: -Dreset=gpio,pin,level\n\
+Where \"pin\" is the GPIO number to use and \"level\" is the logic level, 0 or 1. \n\
 ");
 #endif
     exit(1);
